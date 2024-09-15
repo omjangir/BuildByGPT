@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIP Calculator</title>
+    <title>Retirment Fund SIP Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -122,28 +122,33 @@
             const finalYear = yearNumber + investmentYears - 1;
             results += `<h2>Investment Phase and Withdrawal Phase</h2>`;
             results += `<p>Year after account is depleted: Year ${yearNumber + 50}</p>`;
-            results += `<p>Return after SIP phase is completed: ₹${(balance / 100000).toFixed(2)} Lakh</p>`;
+            
             
             // Investment phase
-            results += `<h3>Investment Phase</h3>`;
+            inv_results = `<h2>SIP Investment Phase</h2>`;
             for (let year = 0; year < investmentYears; year++) {
                 const amountAdded = sipAmount * 12;
                 const investmentReturns = balance * yearlyReturn;
                 const totalWithReturn = balance + investmentReturns + amountAdded;
                 
-                results += `<div><strong>Year ${yearNumber}:</strong><br>`;
-                results += `Initial SIP: ₹${(sipAmount / 100000).toFixed(2)} Lakh<br>`;
-                results += `Amount Added: ₹${(amountAdded / 100000).toFixed(2)} Lakh<br>`;
-                results += `Investment Returns: ₹${(investmentReturns / 100000).toFixed(2)} Lakh<br>`;
-                results += `Balance After SIP: ₹${(totalWithReturn / 100000).toFixed(2)} Lakh</div>`;
+                inv_results += `<div><strong>Year ${yearNumber}:</strong><br>`;
+                inv_results += `Initial SIP: ₹${(sipAmount / 100000).toFixed(2)} Lakh<br>`;
+                inv_results += `Amount Added: ₹${(amountAdded / 100000).toFixed(2)} Lakh<br>`;
+                inv_results += `Investment Returns: ₹${(investmentReturns / 100000).toFixed(2)} Lakh<br>`;
+                inv_results += `Balance After SIP: ₹${(totalWithReturn / 100000).toFixed(2)} Lakh</div>`;
                 
                 balance = totalWithReturn;
                 sipAmount += sipAmount * sipIncrease;
                 yearNumber++;
             }
+
+            results += `<p>Return after SIP phase is completed: ₹${(balance / 100000).toFixed(2)} Lakh</p>`;
+
+            results += inv_results;
             
             // Withdrawal phase
-            results += `<h3>Post Investment Phase</h3>`;
+            results += `<br/>`;
+            results += `<h2>Post SIP Investment Phase</h2>`;
             let withdrawalYear = yearNumber;
             const maxWithdrawalYears = 50;
             

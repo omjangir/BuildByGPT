@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result h2 {
+            color: #333;
+        }
+        .result div {
+            background: #e9ecef;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .result p {
+            margin: 5px 0;
+        }
+        .result p strong {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SIP Calculator</h1>
+        <div class="form-group">
+            <label for="sipAmount">SIP Amount per Month (₹)</label>
+            <input type="number" id="sipAmount" placeholder="Enter SIP Amount">
+        </div>
+        <div class="form-group">
+            <label for="yearlyReturn">Percentage Yearly Return (%)</label>
+            <input type="number" id="yearlyReturn" step="0.1" placeholder="Enter Yearly Return">
+        </div>
+        <div class="form-group">
+            <label for="sipIncrease">Percentage Increase in SIP Amount per Year (%)</label>
+            <input type="number" id="sipIncrease" step="0.1" placeholder="Enter SIP Increase">
+        </div>
+        <div class="form-group">
+            <label for="investmentYears">Number of Years to Invest</label>
+            <input type="number" id="investmentYears" placeholder="Enter Investment Years">
+        </div>
+        <div class="form-group">
+            <label for="inflationRate">Inflation Percentage Yearly (%)</label>
+            <input type="number" id="inflationRate" step="0.1" placeholder="Enter Inflation Rate">
+        </div>
+        <div class="form-group">
+            <label for="monthlyExpense">As per Today, What is Amount Required for Monthly Expense (₹)</label>
+            <input type="number" id="monthlyExpense" placeholder="Enter Monthly Expense">
+        </div>
+        <button class="btn" onclick="calculate()">Calculate Final Amount Yearly</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            const sipAmountInitial = parseFloat(document.getElementById('sipAmount').value);
+            const yearlyReturn = parseFloat(document.getElementById('yearlyReturn').value) / 100;
+            const sipIncrease = parseFloat(document.getElementById('sipIncrease').value) / 100;
+            const investmentYears = parseInt(document.getElementById('investmentYears').value);
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
+            const initialExpense = parseFloat(document.getElementById('monthlyExpense').value);
+            
+            let sipAmount = sipAmountInitial;
+            let balance = 0;
+            let results = '';
+            let expense = initialExpense * Math.pow(1 + inflationRate, investmentYears);
+            let yearNumber = 1;
+            
+            // Initial Title
+            const finalYear = yearNumber + investmentYears - 1;
+            results += `<h2>Investment Phase and Withdrawal Phase</h2>`;
+            results += `<p>Year after account is depleted: Year ${yearNumber + 50}</p>`;
+            results += `<p>Return after SIP phase is completed: ₹${(balance / 100000).toFixed(2)} Lakh</p>`;
+            
+            // Investment phase
+            results += `<h3>Investment Phase</h3>`;
+            for (let year = 0; year < investmentYears; year++) {
+                const amountAdded = sipAmount * 12;
+                const investmentReturns = balance * yearlyReturn;
+                const totalWithReturn = balance + investmentReturns + amountAdded;
+                
+                results += `<div><strong>Year ${yearNumber}:</strong><br>`;
+                results += `Initial SIP: ₹${(sipAmount / 100000).toFixed(2)} Lakh<br>`;
+                results += `Amount Added: ₹${(amountAdded / 100000).toFixed(2)} Lakh<br>`;
+                results += `Investment Returns: ₹${(investmentReturns / 100000).toFixed(2)} Lakh<br>`;
+                results += `Balance After SIP: ₹${(totalWithReturn / 100000).toFixed(2)} Lakh</div>`;
+                
+                balance = totalWithReturn;
+                sipAmount += sipAmount * sipIncrease;
+                yearNumber++;
+            }
+            
+            // Withdrawal phase
+            results += `<h3>Post Investment Phase</h3>`;
+            let withdrawalYear = yearNumber;
+            const maxWithdrawalYears = 50;
+            
+            for (let year = 0; year < maxWithdrawalYears; year++) {
+                const annualExpense = expense * 12;
+                const balanceAfterWithdrawal = balance * (1 + yearlyReturn) - annualExpense;
+                
+                results += `<div><strong>Year ${withdrawalYear}:</strong><br>`;
+                results += `Balance Before Withdrawal: ₹${(balance / 100000).toFixed(2)} Lakh<br>`;
+                results += `Annual Expense: ₹${(annualExpense / 100000).toFixed(2)} Lakh<br>`;
+                results += `Balance After Withdrawal: ₹${(balanceAfterWithdrawal / 100000).toFixed(2)} Lakh<br>`;
+                results += `Investment Return for the Year: ₹${(balance * yearlyReturn / 100000).toFixed(2)} Lakh</div>`;
+                
+                if (balanceAfterWithdrawal <= 0) {
+                    results += `<div>Account depleted in Year ${withdrawalYear}</div>`;
+                    break;
+                }
+                
+                balance = balanceAfterWithdrawal;
+                expense *= (1 + inflationRate);
+                withdrawalYear++;
+            }
+            
+            document.getElementById('result').innerHTML = results;
+            
+            // Save values to localStorage
+            localStorage.setItem('sipAmount', document.getElementById('sipAmount').value);
+            localStorage.setItem('yearlyReturn', document.getElementById('yearlyReturn').value);
+            localStorage.setItem('sipIncrease', document.getElementById('sipIncrease').value);
+            localStorage.setItem('investmentYears', document.getElementById('investmentYears').value);
+            localStorage.setItem('inflationRate', document.getElementById('inflationRate').value);
+            localStorage.setItem('monthlyExpense', document.getElementById('monthlyExpense').value);
+        }
+
+        // Load saved values from localStorage
+        window.onload = () => {
+            document.getElementById('sipAmount').value = localStorage.getItem('sipAmount') || '';
+            document.getElementById('yearlyReturn').value = localStorage.getItem('yearlyReturn') || '';
+            document.getElementById('sipIncrease').value = localStorage.getItem('sipIncrease') || '';
+            document.getElementById('investmentYears').value = localStorage.getItem('investmentYears') || '';
+            document.getElementById('inflationRate').value = localStorage.getItem('inflationRate') || '';
+            document.getElementById('monthlyExpense').value = localStorage.getItem('monthlyExpense') || '';
+        }
+    </script>
+</body>
+</html>
